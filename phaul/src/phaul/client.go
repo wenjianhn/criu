@@ -54,7 +54,8 @@ func isLastIter(iter int, stats *stats.DumpStatsEntry, prev_stats *stats.DumpSta
 func (pc *PhaulClient) Migrate() error {
 	criu := criu.MakeCriu()
 	psi := rpc.CriuPageServerInfo{
-		Fd: proto.Int32(int32(pc.cfg.Memfd)),
+		Address: proto.String(pc.cfg.Addr),
+		Port: proto.Int32(int32(pc.cfg.Port)),
 	}
 	opts := rpc.CriuOpts{
 		Pid:      proto.Int32(int32(pc.cfg.Pid)),

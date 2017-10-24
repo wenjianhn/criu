@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/checkpoint-restore/criu/lib/go/src/criu"
 	"github.com/checkpoint-restore/criu/lib/go/src/rpc"
+	"path/filepath"
 )
 
 type PhaulServer struct {
@@ -35,7 +36,8 @@ func MakePhaulServer(c PhaulConfig) (*PhaulServer, error) {
 func (s *PhaulServer) StartIter() error {
 	fmt.Printf("S: start iter\n")
 	psi := rpc.CriuPageServerInfo{
-		Fd: proto.Int32(int32(s.cfg.Memfd)),
+		Address: proto.String(s.cfg.Addr),
+		Port: proto.Int32(int32(s.cfg.Port)),
 	}
 	opts := rpc.CriuOpts{
 		LogLevel: proto.Int32(4),
@@ -52,7 +54,11 @@ func (s *PhaulServer) StartIter() error {
 
 	opts.ImagesDirFd = proto.Int32(int32(img_dir.Fd()))
 	if prev_p != "" {
-		opts.ParentImg = proto.String(prev_p)
+		rel, err := filepath.Rel(img_dir.Name(), prev_p)
+		if err != nil {
+			return err
+		}
+		opts.ParentImg = proto.String(rel)
 	}
 
 	return s.cr.StartPageServer(opts)

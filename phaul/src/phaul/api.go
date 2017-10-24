@@ -16,6 +16,8 @@ import (
 type PhaulConfig struct {
 	Pid   int
 	Memfd int
+	Port  int32
+	Addr  string
 	Wdir  string
 }
 
